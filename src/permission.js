@@ -3,7 +3,7 @@ import store from './store'
 import { Message } from 'element-ui'
 import NProgress from 'nprogress' // progress bar
 import 'nprogress/nprogress.css' // progress bar style
-import { getToken } from '@/utils/auth' // get token from cookie
+import { getToken, setToken } from '@/utils/auth' // get token from cookie
 import getPageTitle from '@/utils/get-page-title'
 
 NProgress.configure({ showSpinner: false }) // NProgress Configuration
@@ -16,6 +16,21 @@ router.beforeEach(async(to, from, next) => {
 
   // set page title
   document.title = getPageTitle(to.meta.title)
+
+  // 任何url hash部分拥有access_token 都需要进行重置处理
+  const urlFullHash = location.hash.split('#')
+  if (urlFullHash.length === 3) {
+    const oauthInfo = urlFullHash[urlFullHash.length - 1]
+    const paramQuery = oauthInfo.split('&')
+    const paramObj = {}
+    for (const val of paramQuery) {
+      const tmp = val.split('=')
+      paramObj[tmp[0]] = tmp[1]
+    }
+    if (paramObj['access_token']) {
+      setToken(paramObj['access_token'])
+    }
+  }
 
   // determine whether the user has logged in
   const hasToken = getToken()

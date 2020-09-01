@@ -96,6 +96,8 @@ export default {
   },
   methods: {
     showPwd() {
+      debugger
+      console.log(this.$router.query)
       if (this.passwordType === 'password') {
         this.passwordType = ''
       } else {
